@@ -7,15 +7,6 @@ public class AnsweredModelClass {
     String pushKey;
 
 
-    public String getDoctorImageUri() {
-        return doctorImageUri;
-    }
-
-    public void setDoctorImageUri(String doctorImageUri) {
-        this.doctorImageUri = doctorImageUri;
-    }
-
-    String doctorImageUri;
 
     public AnsweredModelClass() {
     }
@@ -52,11 +43,10 @@ public class AnsweredModelClass {
         this.pushKey = pushKey;
     }
 
-    public AnsweredModelClass(String doctorUid, String nameOfDoctor, String answer, String pushKey,String doctorImageUri) {
+    public AnsweredModelClass(String doctorUid, String nameOfDoctor, String answer, String pushKey) {
         this.doctorUid = doctorUid;
         this.nameOfDoctor = nameOfDoctor;
         Answer = answer;
         this.pushKey = pushKey;
-        this.doctorImageUri = doctorImageUri;
     }
 }

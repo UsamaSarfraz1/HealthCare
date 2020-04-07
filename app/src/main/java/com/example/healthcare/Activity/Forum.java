@@ -32,6 +32,8 @@ import com.example.healthcare.Adapter.CommentAdapter;
 import com.example.healthcare.Interface.APIService;
 import com.example.healthcare.Model.AnsweredModelClass;
 import com.example.healthcare.Model.CommentModelClass;
+import com.example.healthcare.Model.DpsOfUsers;
+import com.example.healthcare.Model.ForumConstantsClass;
 import com.example.healthcare.Model.Like;
 import com.example.healthcare.Model.UserConstantModel;
 import com.example.healthcare.Notification.Client;
@@ -77,6 +79,7 @@ public class Forum extends AppCompatActivity {
     public String UserId;
     CircleImageView senderPic;
     public static APIService apiService;
+    TextView profileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,7 @@ public class Forum extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        profileName=findViewById(R.id.nameProfileForum);
         postTitleForum=findViewById(R.id.postTitleForum);
         descriptionForum=findViewById(R.id.descriptionForum);
         dateForum=findViewById(R.id.postDateForum);
@@ -101,9 +105,22 @@ public class Forum extends AppCompatActivity {
         descriptionForum.setText(bundle.getString("description"));
         dateForum.setText(bundle.getString("date"));
         Glide.with(this).load( bundle.getString("imageUrl")).placeholder(R.mipmap.ic_launcher).into(image);
-        Glide.with(this).load( bundle.getString("dp")).placeholder(R.mipmap.ic_launcher).into(senderPic);
+        GetDpsOfUser(senderPic,bundle.getString("UserId"));
+
         UserId = bundle.getString("UserId");
-        Log.i("bundle = ",bundle.getString("pushKey"));
+
+        /////////////// These values for notification pending Intent ///////////////////////////
+
+        ForumConstantsClass.title = bundle.getString("postTitle");
+        ForumConstantsClass.description = bundle.getString("description");
+        ForumConstantsClass.date = bundle.getString("date");
+        ForumConstantsClass.imageUri = bundle.getString("imageUrl");
+        ForumConstantsClass.UserId = bundle.getString("UserId");
+        ForumConstantsClass.pushKey = bundle.getString("pushKey");
+
+        /////////////// These values for notification pending Intent ///////////////////////////
+
+
 
         btnAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -275,6 +292,32 @@ public class Forum extends AppCompatActivity {
 
 
 
+    //////////// This function will set the Dp of specific user ///////////////////////////////
+
+    public void GetDpsOfUser(final CircleImageView circleImageView, String userId){
+        final DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference("DpsOfUsers");
+        databaseReference.child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists() && dataSnapshot !=null){
+                    DpsOfUsers dpsOfUsers=dataSnapshot.getValue(DpsOfUsers.class);
+                    Glide.with(Forum.this).load(dpsOfUsers.getImageUri()).placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                }else {
+                    Glide.with(Forum.this).load("null").placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(Forum.this, "something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //////////// This function will set the Dp of specific user ///////////////////////////////
+
+
+
     /////////// This function Will get Answers related to specific Post //////////////////
 
     public  void getAnsweredPost(String pushKeyOfPost, final View v){
@@ -323,12 +366,10 @@ public class Forum extends AppCompatActivity {
                 map.put("nameOfDoctor",UserConstantModel.Name);
                 map.put("Answer",answer);
                 map.put("pushKey",dataSnapshot.getRef().getParent().getKey());
-                map.put("ImageUri",UserConstantModel.ImageUri);
                 dataSnapshot.getRef().updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(context, "Answered", Toast.LENGTH_SHORT).show();
-                        sendNotificationClass.sendNotification(UserId,"Answered","you have new answer",Forum.this);
+                        sendNotificationClass.sendNotification(UserId,"you have new answer by "+UserConstantModel.Name,bundle.getString("postTitle"),Forum.this);
                     }
                 });
             }
@@ -452,11 +493,11 @@ public class Forum extends AppCompatActivity {
                 map.put("nameOfUser",UserConstantModel.Name);
                 map.put("Comment",comment);
                 map.put("pushKey",dataSnapshot.getRef().getParent().getKey());
-                map.put("CommentImageUri",UserConstantModel.ImageUri);
 
                 dataSnapshot.getRef().updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        sendNotificationClass.sendNotification(UserId,UserConstantModel.Name+" commented on your post",bundle.getString("postTitle"),Forum.this);
                     }
                 });
             }

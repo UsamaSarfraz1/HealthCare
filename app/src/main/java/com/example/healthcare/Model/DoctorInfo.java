@@ -7,21 +7,18 @@ public class DoctorInfo {
     String user_type;
     String reg_id;
     String doctorUid;
-    String imageUrl;
 
 
     public DoctorInfo() {
     }
 
-    public DoctorInfo(String doctorName, String doctorEmail, String doctorSpecification, String user_type, String reg_id, String doctorUid, String imageUrl) {
+    public DoctorInfo(String doctorName, String doctorEmail, String doctorSpecification, String user_type, String reg_id, String doctorUid) {
         this.doctorName = doctorName;
         this.doctorEmail = doctorEmail;
         this.doctorSpecification = doctorSpecification;
         this.user_type = user_type;
         this.reg_id = reg_id;
         this.doctorUid=doctorUid;
-        this.imageUrl=imageUrl;
-
     }
 
     public String getDoctorName() {
@@ -46,9 +43,5 @@ public class DoctorInfo {
 
     public String getDoctorUid() {
         return doctorUid;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
     }
 }

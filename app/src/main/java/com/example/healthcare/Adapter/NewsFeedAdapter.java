@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.healthcare.Activity.Forum;
 import com.example.healthcare.Activity.Signup_Patient;
+import com.example.healthcare.Model.DpsOfUsers;
 import com.example.healthcare.Model.Like;
 import com.example.healthcare.Model.NewsFeedModel;
 import com.example.healthcare.R;
@@ -72,21 +73,20 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.NewsFe
             Glide.with(mContext).load(newsFeedsList.get(position).getImageUri()).placeholder(R.mipmap.ic_launcher).into(holder.image);
         }
 
-        if (!newsFeedsList.get(position).getDp().equals("null")){
-            Glide.with(mContext).load(newsFeedsList.get(position).getDp()).placeholder(R.mipmap.ic_launcher).into(holder.senderPic);
-        }
+
+        GetDpsOfUser(holder.senderPic,newsFeedsList.get(position).getUserid());
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(mContext, Forum.class);
+                intent.putExtra("postTitle",newsFeedsList.get(position).getName());
                 intent.putExtra("postTitle",title);
                 intent.putExtra("imageUrl",newsFeedsList.get(position).getImageUri());
                 intent.putExtra("date","21-10-1997");
                 intent.putExtra("description",description);
                 intent.putExtra("pushKey",newsFeedsList.get(position).getPushKey());
                 intent.putExtra("UserId",newsFeedsList.get(position).getUserid());
-                intent.putExtra("dp",newsFeedsList.get(position).getDp());
                 mContext.startActivity(intent);
             }
         });
@@ -121,6 +121,30 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.NewsFe
 
     }
 
+
+    //////////// This function will set the Dp of specific user ///////////////////////////////
+
+    public void GetDpsOfUser(final CircleImageView circleImageView, String userId){
+        final DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference("DpsOfUsers");
+        databaseReference.child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists() && dataSnapshot !=null){
+                    DpsOfUsers dpsOfUsers=dataSnapshot.getValue(DpsOfUsers.class);
+                    Glide.with(mContext).load(dpsOfUsers.getImageUri()).placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                }else {
+                    Glide.with(mContext).load("null").placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(mContext, "something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //////////// This function will set the Dp of specific user ///////////////////////////////
 
     public void AddLikeToCurrentPost(String pushKey){
         databaseReference= FirebaseDatabase.getInstance().getReference("Like");

@@ -14,6 +14,8 @@ import androidx.core.app.NotificationCompat;
 
 
 import com.example.healthcare.Activity.ChatActivity;
+import com.example.healthcare.Activity.Forum;
+import com.example.healthcare.Model.ForumConstantsClass;
 import com.google.firebase.messaging.RemoteMessage;
 
 public class MyNotifications {
@@ -31,10 +33,13 @@ public class MyNotifications {
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
         int j = Integer.parseInt(user.replaceAll("[\\D]",""));
-        Intent intent=new Intent(context, ChatActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("key",user);
-        intent.putExtras(bundle);
+        Intent intent=new Intent(context, Forum.class);
+        intent.putExtra("postTitle", ForumConstantsClass.title);
+        intent.putExtra("imageUrl",ForumConstantsClass.imageUri);
+        intent.putExtra("date",ForumConstantsClass.date);
+        intent.putExtra("description",ForumConstantsClass.description);
+        intent.putExtra("pushKey",ForumConstantsClass.pushKey);
+        intent.putExtra("UserId",ForumConstantsClass.UserId);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent= PendingIntent.getActivity(context,j,intent,PendingIntent.FLAG_ONE_SHOT);
 
