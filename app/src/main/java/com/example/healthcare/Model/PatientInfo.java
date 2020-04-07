@@ -6,18 +6,16 @@ public class PatientInfo {
     private String patientGender;
     private String userType;
     private String patientUid;
-    private String imageUrl;
 
     public PatientInfo() {
     }
 
-    public PatientInfo(String patientName, String patientEmail, String patientGender, String userType ,String patientUid ,String imageUrl) {
+    public PatientInfo(String patientName, String patientEmail, String patientGender, String userType ,String patientUid) {
         this.patientName = patientName;
         this.patientEmail = patientEmail;
         this.patientGender = patientGender;
         this.userType = userType;
         this.patientUid=patientUid;
-        this.imageUrl=imageUrl;
     }
 
     public String getPatientName() {
@@ -38,9 +36,5 @@ public class PatientInfo {
 
     public String getPatientUid() {
         return patientUid;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
     }
 }

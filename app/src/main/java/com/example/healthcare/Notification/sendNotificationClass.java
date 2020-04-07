@@ -29,51 +29,48 @@ public class sendNotificationClass {
 
     public static FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
 
-    public static void sendNotification(final String receiver1, final String name, final String msg, final Context context){
+    public static void sendNotification(final String receiver1, final String msg, final String title , final Context context){
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
         Query query = tokens.orderByKey().equalTo(receiver1);
         query.addValueEventListener(new ValueEventListener() {
-          @Override
-          public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-             for (DataSnapshot snapshot:dataSnapshot.getChildren()) {
-                 Token token = snapshot.getValue(Token.class);
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot:dataSnapshot.getChildren()) {
+                    Token token = snapshot.getValue(Token.class);
 
-                 Toast.makeText(context, "here ", Toast.LENGTH_SHORT).show();
-
-                 Data data = null;
-                 if (!msg.equals("")) {
-                     data = new Data(firebaseUser.getUid(), R.mipmap.ic_launcher, name + ": " + msg, "New Answer", receiver1);
-                 }
+                    Data data = null;
+                    if (!msg.equals("")) {
+                        data = new Data(firebaseUser.getUid(), R.mipmap.ic_launcher, msg, title, receiver1);
+                    }
 
 
-                 assert token != null;
-                 Sender sender = new Sender(data, token.getToken());
-                 apiService.sendNotification(sender)
-                         .enqueue(new Callback<MyResponse>() {
-                             @Override
-                             public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-                                 if (response.code() == 200) {
-                                     Toast.makeText(context, "successfull", Toast.LENGTH_SHORT).show();
-                                     if (response.body().success != 1)
-                                         Toast.makeText(context, "failed", Toast.LENGTH_SHORT).show();
-                                 } else {
-                                     Toast.makeText(context, "response is not workinig...", Toast.LENGTH_SHORT).show();
-                                 }
-                             }
+                    assert token != null;
+                    Sender sender = new Sender(data, token.getToken());
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200) {
+                                        if (response.body().success != 1)
+                                            Toast.makeText(context, "failed", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(context, "response is not workinig...", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
 
-                             @Override
-                             public void onFailure(Call<MyResponse> call, Throwable t) {
-                                 Toast.makeText(context, "failure", Toast.LENGTH_SHORT).show();
-                             }
-                         });
-             }
-         }
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+                                    Toast.makeText(context, "failure", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            }
 
-         @Override
-         public void onCancelled(@NonNull DatabaseError databaseError) {
-             Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show();
-         }
-     });
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

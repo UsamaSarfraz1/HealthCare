@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.healthcare.Model.CommentModelClass;
+import com.example.healthcare.Model.DpsOfUsers;
 import com.example.healthcare.Model.Like;
 import com.example.healthcare.Model.UserConstantModel;
 import com.example.healthcare.R;
@@ -34,7 +35,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     Context context;
     List<CommentModelClass> commentModelClasses;
-    public static final String COMMENTED_LIKES="CommentedLikes";
+    public static final String COMMENTED_LIKES = "CommentedLikes";
 
     public CommentAdapter(Context context, List<CommentModelClass> answeredModelClasses) {
         this.context = context;
@@ -44,19 +45,20 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     @NonNull
     @Override
     public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_recyclerview_layout,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_recyclerview_layout, parent, false);
         return new CommentAdapter.CommentViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, final int position) {
-        Glide.with(context).load(UserConstantModel.ImageUri).placeholder(R.mipmap.ic_launcher).into(holder.commentDp);
+        Glide.with(context).load("null").placeholder(R.mipmap.ic_launcher).into(holder.commentDp);
         holder.UserName.setText(commentModelClasses.get(position).getNameOfUser());
 
 
-        GetLikesOfCurrentPostOfCurrentComment(holder.noOfLikes,commentModelClasses.get(position).getPushKey());
+        GetLikesOfCurrentPostOfCurrentComment(holder.noOfLikes, commentModelClasses.get(position).getPushKey());
         holder.comment.setText(commentModelClasses.get(position).getComment());
-        CheckIfUserAlreadyLikedComments(holder.commentLiked,commentModelClasses.get(position).getPushKey());
+        CheckIfUserAlreadyLikedComments(holder.commentLiked, commentModelClasses.get(position).getPushKey());
+        GetDpsOfUser(holder.commentDp,commentModelClasses.get(position).getUserUid());
         holder.commentLiked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,29 +74,58 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     public class CommentViewHolder extends RecyclerView.ViewHolder {
         CircleImageView commentDp;
-        TextView UserName,noOfLikes,comment,commentLiked;
+        TextView UserName, noOfLikes, comment, commentLiked;
+
         public CommentViewHolder(@NonNull View itemView) {
             super(itemView);
-            commentDp=itemView.findViewById(R.id.commentDp);
-            UserName=itemView.findViewById(R.id.commentName);
-            noOfLikes=itemView.findViewById(R.id.noOfLikes);
-            comment=itemView.findViewById(R.id.commentDescription);
-            commentLiked=itemView.findViewById(R.id.commentLiked);
+            commentDp = itemView.findViewById(R.id.commentDp);
+            UserName = itemView.findViewById(R.id.commentName);
+            noOfLikes = itemView.findViewById(R.id.noOfLikes);
+            comment = itemView.findViewById(R.id.commentDescription);
+            commentLiked = itemView.findViewById(R.id.commentLiked);
         }
     }
 
 
+
+    //////////// This function will set the Dp of specific user ///////////////////////////////
+
+    public void GetDpsOfUser(final CircleImageView circleImageView, String userId){
+        final DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference("DpsOfUsers");
+        databaseReference.child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists() && dataSnapshot !=null){
+                    DpsOfUsers dpsOfUsers=dataSnapshot.getValue(DpsOfUsers.class);
+                    Glide.with(context).load(dpsOfUsers.getImageUri()).placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                }else {
+                    Glide.with(context).load("null").placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //////////// This function will set the Dp of specific user ///////////////////////////////
+
+
+
+
     //////////// This function will set the Like to specific Comment ////////////////////
 
-    public  void setCommentedLikes(String pushKeyOfComment){
-        final DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference(COMMENTED_LIKES);
+    public void setCommentedLikes(String pushKeyOfComment) {
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(COMMENTED_LIKES);
         databaseReference.child(pushKeyOfComment).child(UserConstantModel.Uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null){
-                    Like liked =dataSnapshot.getValue(Like.class);
-                    if(liked != null){
-                        if (liked.isLiked()){
+                if (dataSnapshot != null) {
+                    Like liked = dataSnapshot.getValue(Like.class);
+                    if (liked != null) {
+                        if (liked.isLiked()) {
                             dataSnapshot.getRef().removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -102,9 +133,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                                 }
                             });
                         }
-                    }else {
-                        HashMap<String,Object> map=new HashMap<>();
-                        map.put("Liked",true);
+                    } else {
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("Liked", true);
                         dataSnapshot.getRef().updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -122,17 +153,15 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         });
 
 
-
     }
 
     //////////// This function will set the Like to specific Comment ////////////////////
 
 
-
     //////////// This function will get the number of Likes of specific comment of specific Post ////////////////
 
-    public  void GetLikesOfCurrentPostOfCurrentComment(final TextView noOfLikes, String pushKeyOfComment){
-        DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference(COMMENTED_LIKES);
+    public void GetLikesOfCurrentPostOfCurrentComment(final TextView noOfLikes, String pushKeyOfComment) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(COMMENTED_LIKES);
         databaseReference.child(pushKeyOfComment).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -149,21 +178,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     //////////// This function will get the Likes of specific comment of specific Post ////////////////
 
 
-
-
     /////// This function will set if user liked then text will set to liked and color will be changed/////////////////
 
 
-
-    public void CheckIfUserAlreadyLikedComments(final TextView Liked, String pushKey){
+    public void CheckIfUserAlreadyLikedComments(final TextView Liked, String pushKey) {
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(COMMENTED_LIKES);
         databaseReference.child(pushKey).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(UserConstantModel.Uid)){
+                if (dataSnapshot.hasChild(UserConstantModel.Uid)) {
                     Liked.setText("Liked");
                     Liked.setTextColor(context.getResources().getColor(R.color.LikedColor));
-                }else {
+                } else {
                     Liked.setText("Like");
                     Liked.setTextColor(context.getResources().getColor(R.color.LikeColor));
                 }
@@ -175,6 +201,5 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             }
         });
     }
-    /////// This function will set if user liked then text will set to liked and color will be changed/////////////////
-
+/////// This function will set if user liked then text will set to liked and color will be changed/////////////////
 }

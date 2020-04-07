@@ -10,15 +10,13 @@ public class CommentModelClass {
 
     String Comment;
     String pushKey;
-    String commentImageUri;
 
 
-    public CommentModelClass(String userUid, String nameOfUser, String comment, String pushKey, String commentImageUri) {
+    public CommentModelClass(String userUid, String nameOfUser, String comment, String pushKey) {
         UserUid = userUid;
         this.nameOfUser = nameOfUser;
         Comment = comment;
         this.pushKey = pushKey;
-        this.commentImageUri = commentImageUri;
     }
 
     public String getUserUid() {
@@ -53,11 +51,4 @@ public class CommentModelClass {
         this.pushKey = pushKey;
     }
 
-    public String getCommentImageUri() {
-        return commentImageUri;
-    }
-
-    public void setCommentImageUri(String commentImageUri) {
-        this.commentImageUri = commentImageUri;
-    }
 }

@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.example.healthcare.Activity.ChatActivity;
 import com.example.healthcare.Activity.Forum;
 import com.example.healthcare.Model.AnsweredModelClass;
+import com.example.healthcare.Model.DpsOfUsers;
 import com.example.healthcare.Model.Like;
 import com.example.healthcare.Model.UserConstantModel;
 import com.example.healthcare.R;
@@ -53,12 +54,13 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
 
     @Override
     public void onBindViewHolder(@NonNull final AnswerViewHolder holder, final int position) {
-        Glide.with(context).load(answeredModelClasses.get(position).getDoctorImageUri()).placeholder(R.mipmap.ic_launcher).into(holder.answerDp);
+        Glide.with(context).load("null").placeholder(R.mipmap.ic_launcher).into(holder.answerDp);
         holder.answerDoctorName.setText(answeredModelClasses.get(position).getNameOfDoctor());
 
         Log.i("answered value == ",answeredModelClasses.get(position).getPushKey()+" "+answeredModelClasses.get(position).getNameOfDoctor());
 
         GetLikesOfCurrentPostOfCurrentAnswer(holder.noOfLikes,answeredModelClasses.get(position).getPushKey());
+        GetDpsOfUser(holder.answerDp,answeredModelClasses.get(position).getDoctorUid());
         holder.answer.setText(answeredModelClasses.get(position).getAnswer());
         CheckIfUserAlreadyLikedAnswer(holder.answeredLiked,answeredModelClasses.get(position).getPushKey());
         holder.answeredLiked.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +100,33 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
             answerChat=itemView.findViewById(R.id.answerChat);
         }
     }
+
+
+    //////////// This function will set the Dp of specific user ///////////////////////////////
+
+    public void GetDpsOfUser(final CircleImageView circleImageView, String userId){
+        final DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference("DpsOfUsers");
+        databaseReference.child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists() && dataSnapshot !=null){
+                    DpsOfUsers dpsOfUsers=dataSnapshot.getValue(DpsOfUsers.class);
+                    Glide.with(context).load(dpsOfUsers.getImageUri()).placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                }else {
+                    Glide.with(context).load("null").placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //////////// This function will set the Dp of specific user ///////////////////////////////
+
+
 
 
     //////////// This function will set the Like to specific Answer ////////////////////

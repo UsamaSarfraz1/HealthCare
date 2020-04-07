@@ -265,10 +265,7 @@ public class ProfileFragment extends Fragment {
                     name.setText(patientInfo.getPatientName());
                     email.setText(patientInfo.getPatientEmail());
                     gender.setText(patientInfo.getPatientGender());
-                    Log.i("agya v agya",patientInfo.getImageUrl());
-                    if (!patientInfo.getImageUrl().isEmpty()){
-                        Glide.with(getContext()).load(patientInfo.getImageUrl()).into(selectImage);
-                    }
+                        Glide.with(getContext()).load("null").placeholder(R.mipmap.ic_launcher).into(selectImage);
 
                 }
                 else if (MainActivity.userType.equals("doctor")){
@@ -277,9 +274,7 @@ public class ProfileFragment extends Fragment {
                     email.setText(doctorInfo.getDoctorEmail());
                     specification.setText(doctorInfo.getDoctorSpecification());
 
-                    if (!doctorInfo.getImageUrl().isEmpty()){
-                        Glide.with(getContext()).load(doctorInfo.getImageUrl()).into(selectImage);
-                    }
+                    Glide.with(getContext()).load("null").placeholder(R.mipmap.ic_launcher).into(selectImage);
 
                 }
                 acordingUserType();

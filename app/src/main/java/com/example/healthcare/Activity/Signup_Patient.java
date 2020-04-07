@@ -117,7 +117,7 @@ public class Signup_Patient extends AppCompatActivity implements View.OnClickLis
                     if (task.isSuccessful()){
                         progressDialog.dismiss();
                         final String patientUid=FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        PatientInfo patientInfo=new PatientInfo(user_name,email,gender,user_type,patientUid,null);
+                        PatientInfo patientInfo=new PatientInfo(user_name,email,gender,user_type,patientUid);
                         mdatabaseReference.child("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                 .setValue(patientInfo).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override

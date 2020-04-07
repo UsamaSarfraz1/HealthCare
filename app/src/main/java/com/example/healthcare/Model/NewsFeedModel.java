@@ -11,15 +11,7 @@ public class NewsFeedModel {
     String Category;
     String Name;
 
-    public String getDp() {
-        return dp;
-    }
 
-    public void setDp(String dp) {
-        this.dp = dp;
-    }
-
-    String dp;
 
     public String getName() {
         return Name;
@@ -80,7 +72,7 @@ public class NewsFeedModel {
         Category = category;
     }
 
-    public NewsFeedModel(String userid, String title, String description, String pushKey, String imageUri, String category, String Name,String dp) {
+    public NewsFeedModel(String userid, String title, String description, String pushKey, String imageUri, String category, String Name) {
         Userid = userid;
         Title = title;
         Description = description;
@@ -88,6 +80,5 @@ public class NewsFeedModel {
         ImageUri = imageUri;
         Category = category;
         this.Name=Name;
-        this.dp=dp;
     }
 }

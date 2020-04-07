@@ -117,7 +117,7 @@ public class Signup_Doctor extends AppCompatActivity implements View.OnClickList
                     if (task.isSuccessful()){
                         progressDialog.dismiss();
                         final String doctorUid=FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        DoctorInfo doctorInfo=new DoctorInfo(name,email,spcification,user_type,regId,doctorUid,null);
+                        DoctorInfo doctorInfo=new DoctorInfo(name,email,spcification,user_type,regId,doctorUid);
                         databaseReference.child("doctor").child(doctorUid)
                                 .setValue(doctorInfo).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override

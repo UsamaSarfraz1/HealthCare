@@ -39,6 +39,7 @@ import com.example.healthcare.Model.Root;
 import com.example.healthcare.Model.TypeOfUser;
 import com.example.healthcare.Model.UserConstantModel;
 import com.example.healthcare.Model.UserModel;
+import com.example.healthcare.Notification.Token;
 import com.example.healthcare.Remote.Common;
 import com.example.healthcare.Remote.IGoogleApiClient;
 import com.google.android.gms.common.ConnectionResult;
@@ -62,6 +63,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         }
 
+        updateToken(FirebaseInstanceId.getInstance().getToken());
         final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkRequest.Builder builder = new NetworkRequest.Builder();
@@ -141,6 +144,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
+
+    private void updateToken(String token){
+        DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference("Tokens");
+        Token token1=new Token(token);
+        databaseReference.child(firebaseUser.getUid()).setValue(token1);
+    }
 
     public void getUsertype(){
         final String uId=FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -173,8 +182,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         UserConstantModel.Email = userModel.getPatientEmail();
                         UserConstantModel.Uid =  userModel.getPatientUid();
                         UserConstantModel.UserType = userModel.getUserType();
-                        UserConstantModel.ImageUri = userModel.getImageUrl();
-
                         Log.i("constants = ",UserConstantModel.Uid);
 
                     }else {
@@ -182,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         UserConstantModel.Name = userModel.getDoctorName();
                         UserConstantModel.Email = userModel.getDoctorEmail();
                         UserConstantModel.Uid =  userModel.getDoctorUid();
-                        UserConstantModel.ImageUri = userModel.getImageUrl();
                         UserConstantModel.UserType = userModel.getUser_type();
                     }
 
